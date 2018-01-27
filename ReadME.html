@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Regression Modeling Project</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Regression Modeling Project</h1>
+
+<p>You work for Motor Trend, a magazine about the automobile industry. Looking at a data set of a collection of cars, they are interested in exploring the relationship between a set of variables and miles per gallon (MPG) (outcome). They are particularly interested in the following two questions:</p>
+
+<ul>
+<li>“Is an automatic or manual transmission better for MPG”</li>
+<li>&ldquo;Quantify the MPG difference between automatic and manual transmissions&rdquo;</li>
+</ul>
+
+<h2>Analysis results Answer</h2>
+
+<ul>
+<li>The automatic or manual tranmission as compared to MPG for this data set is not statistically significant.</li>
+<li>The MPG difference is 1.8 for automatic transmission vs. manual tranmissions.</li>
+</ul>
+
+<h1>Step 1 : Preprocessing</h1>
+
+<p><code>head(mtcars)</code></p>
+
+<h2>data overview</h2>
+
+<pre><code>#                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+# Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+# Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+# Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+# Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+# Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+# Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1
+</code></pre>
+
+<h2>check attributes</h2>
+
+<p><code>str(mtcars)</code></p>
+
+<pre><code>#&#39;data.frame&#39;:  32 obs. of  11 variables:
+# $ mpg : num  21 21 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 ...
+# $ cyl : num  6 6 4 6 8 6 8 4 4 6 ...
+# $ disp: num  160 160 108 258 360 ...
+# $ hp  : num  110 110 93 110 175 105 245 62 95 123 ...
+# $ drat: num  3.9 3.9 3.85 3.08 3.15 2.76 3.21 3.69 3.92 3.92 ...
+# $ wt  : num  2.62 2.88 2.32 3.21 3.44 ...
+# $ qsec: num  16.5 17 18.6 19.4 17 ...
+# $ vs  : num  0 0 1 1 0 1 0 1 1 1 ...
+# $ am  : num  1 1 1 0 0 0 0 0 0 0 ...
+# $ gear: num  4 4 4 3 3 3 3 4 4 4 ...
+# $ carb: num  4 4 1 1 2 1 4 2 2 4 ...
+
+</code></pre>
+
+<h2>factories some attributes</h2>
+
+<pre><code>mtcars$cyl &lt;- as.factor(mtcars$cyl)
+mtcars$vs &lt;- as.factor(mtcars$vs)
+mtcars$am &lt;- as.factor(mtcars$am)
+mtcars$gear &lt;- as.factor(mtcars$gear)
+mtcars$carb &lt;- as.factor(mtcars$carb)
+</code></pre>
+
+<h1>Step 2 : Do Some Analysis</h1>
+
+<h2>Apply linear regression modelling</h2>
+
+<p><code>fit.linear.mod &lt;- lm(mpg ~ am, mtcars)</code></p>
+
+<h3>lm results</h3>
+
+<p><code>summary(fit.linear.mod)</code></p>
+
+<p>First figures in the Appendix</p>
+
+<pre><code>Call:
+lm(formula = mpg ~ am, data = mtcars)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-9.3923 -3.0923 -0.2974  3.2439  9.5077 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   17.147      1.125  15.247 1.13e-15 ***
+am1            7.245      1.764   4.106 0.000285 ***
+
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.902 on 30 degrees of freedom
+Multiple R-squared:  0.3598,    Adjusted R-squared:  0.3385 
+F-statistic: 16.86 on 1 and 30 DF,  p-value: 0.000285
+</code></pre>
+
+<h2>review coefs</h2>
+
+<pre><code>beta &lt;- .7245  
+SE &lt;- 1.764        
+t &lt;- qt(1-0.05/2, df = length(mtcars$mpg) - 2)
+c(beta - t*SE, beta + t *SE)
+</code></pre>
+
+<p><code>[1] -2.878069  4.327069</code></p>
+
+<h3>Note</h3>
+
+<p>From both the plots in Figure one, </p>
+
+<ul>
+<li>results of our coefficient summary, small p-value, and inclusion of 0 in the confidence internval, we reject the null hypothesis that tranmission affects MPG.</li>
+</ul>
+
+<h2>multi-variant analysis</h2>
+
+<p><code>fit.all.vars &lt;- lm(mpg ~ . , mtcars)</code></p>
+
+<h2>explore nesesary variables</h2>
+
+<pre><code>library(MASS)
+aci.step &lt;- stepAIC(fit.all.vars, direction=&quot;both&quot;, trace=FALSE)
+summary(aci.step)
+</code></pre>
+
+<h3>exploring results</h3>
+
+<pre><code>Call:
+lm(formula = mpg ~ cyl + hp + wt + am, data = mtcars)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.9387 -1.2560 -0.4013  1.1253  5.0513 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 33.70832    2.60489  12.940 7.73e-13 ***
+cyl6        -3.03134    1.40728  -2.154  0.04068 *  
+cyl8        -2.16368    2.28425  -0.947  0.35225    
+hp          -0.03211    0.01369  -2.345  0.02693 *  
+wt          -2.49683    0.88559  -2.819  0.00908 ** 
+am1          1.80921    1.39630   1.296  0.20646    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.41 on 26 degrees of freedom
+Multiple R-squared:  0.8659,    Adjusted R-squared:  0.8401 
+F-statistic: 33.57 on 5 and 26 DF,  p-value: 1.506e-10
+</code></pre>
+
+<ul>
+<li>As we see the significant variables in relation to the mpg are cyl(cylinders), hp(horsepower) and wt(weight)</li>
+</ul>
+
+<h1>Step 3 : Compare models</h1>
+
+<p><code>anova(fit.linear.mod, aci.step)</code></p>
+
+<h2>comp. results</h2>
+
+<pre><code>Analysis of Variance Table
+
+Model 1: mpg ~ am
+Model 2: mpg ~ cyl + hp + wt + am
+  Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    
+1     30 720.90                                  
+2     26 151.03  4    569.87 24.527 1.688e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+</code></pre>
+
+<h1>Step 4 : Find Significance of the transmission type on mpg</h1>
+
+<h2>check coefs</h2>
+
+<p><code>coefficients(summary(aci.step))</code></p>
+
+<pre><code>               Estimate Std. Error   t value     Pr(&gt;|t|)
+(Intercept) 33.70832390 2.60488618 12.940421 7.733392e-13
+cyl6        -3.03134449 1.40728351 -2.154040 4.068272e-02
+cyl8        -2.16367532 2.28425172 -0.947214 3.522509e-01
+hp          -0.03210943 0.01369257 -2.345025 2.693461e-02
+wt          -2.49682942 0.88558779 -2.819404 9.081408e-03
+am1          1.80921138 1.39630450  1.295714 2.064597e-01
+</code></pre>
+
+<blockquote>
+<p>Reviewing the p-values in the summary data, we can see that the p-value for am (automatic vs. manual transmission) is not significant in the measurement of mpg. This can be proven with the confidence interval formula as done previously in the Exploratory analysis section.</p>
+</blockquote>
+
+<pre><code>beta1 &lt;- 1.80921138  #From the summary for am 
+SE1 &lt;- 1.39630450       #From the summary for am
+t1 &lt;- qt(1-0.05/2, df = length(mtcars$mpg) - 2)
+c(beta1 - t1*SE1, beta1 + t1 *SE1)
+
+</code></pre>
+
+<p><code>[1] -1.042423  4.660846</code></p>
+
+<blockquote>
+<p>Since the confidence interval includes 0 and the p-value is greater than .05, the difference between an automatic tranmission and a manual transmission does not significantly impact mpg(miles per gallon). It does however show that an automatic tranmission is 1.8 greater than a manual transmission.</p>
+</blockquote>
+
+<h1>Concluded Results</h1>
+
+<p>The best fit in model 2 it is shown that the Normal Q-Q graph is normally distributed and the Scale-Location graph has a a steady variance. This is improved from Figure 1 where only am(transmission type) was compared with mpg. Upon further review, it was determined that am did not have a significant impact on mpg.</p>
+
+<h1>Appendix</h1>
+
+<h2>lm figure</h2>
+
+<pre><code>par(mfrow=c(2,2))
+plot(fit.linear.mod); 
+abline(fit.linear.mod)
+</code></pre>
+
+<p><img src="%22https://github.com/Rana-ElRobi/ds-regression-project/blob/master/fig-lm.png%22" alt="lm"/></p>
+
+<h2>Multivariant figure</h2>
+
+<pre><code>par(mfrow=c(2,2))
+plot(aci.step); 
+abline(aci.step)
+</code></pre>
+
+<p><img src="%22https://github.com/Rana-ElRobi/ds-regression-project/blob/master/fig-mv.png%22" alt="mv"/></p>
+
+</body>
+
+</html>
